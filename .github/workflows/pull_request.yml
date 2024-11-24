@@ -1,0 +1,43 @@
+name: pull_request
+run-name: pull_request ${{ github.actor }}
+
+on: [pull_request]
+
+env:
+  CI_ID: ci-${{ github.run_id }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copy repository
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 20.13.1
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.13.1'
+
+      - name: Install npm dependencies
+        run: cd Backend && yarn install
+
+      - name: Build code
+        run: cd Backend && yarn build
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copy repository
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 20.13.1
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.13.1'
+
+      - name: Install npm dependencies
+        run: cd Backend && yarn install
+
+      - name: Run tests
+        run: cd Backend && yarn test
