@@ -1,7 +1,7 @@
-import { VehicleType } from '../Domain/types/VehiculeType';
+import { VehicleType } from '../Domain/types/VehicleType';
 import { generateUuid } from './Helpers';
 
-export function fakeVehicule(params?: Partial<VehicleType>): VehicleType {
+export function fakeVehicle(params?: Partial<VehicleType>): VehicleType {
   return {
     fleetId: generateUuid(),
     vehicleId: generateUuid(),
