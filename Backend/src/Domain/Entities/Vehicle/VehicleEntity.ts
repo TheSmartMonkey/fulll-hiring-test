@@ -1,3 +1,4 @@
+import { VehiclesFleetType } from 'src/Domain/types/VehiclesFleetType';
 import {
   getVehicleByVehicleIdAndFleetIdQuery,
   isVehicleRegisteredQuery,
@@ -18,7 +19,7 @@ export async function registerVehicleInFleet(vehicle: VehicleType): Promise<bool
   return true;
 }
 
-export async function hasVehicleInFleet(fleetId: VehicleType['fleetId'], vehicleId: VehicleType['vehicleId']): Promise<boolean> {
+export async function hasVehicleInFleet(fleetId: VehiclesFleetType['fleetId'], vehicleId: VehiclesFleetType['vehicleId']): Promise<boolean> {
   Logger.info('hasVehicleInFleet');
   const vehicle = await getVehicleByVehicleIdAndFleetIdQuery(fleetId, vehicleId);
   return vehicle !== undefined;
