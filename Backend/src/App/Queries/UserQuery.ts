@@ -9,7 +9,7 @@ export async function getAllUsersQuery(): Promise<UserType[]> {
 
 export async function createUserQuery(user: UserType): Promise<UserType> {
   const db = await connectToDatabase();
-  await db.run('INSERT INTO users (userId, fleetId, name) VALUES (?, ?, ?)', user.userId, user.fleetId, user.name);
+  await db.run('INSERT INTO users (userId, fleetId) VALUES (?, ?)', user.userId, user.fleetId);
   return user;
 }
 

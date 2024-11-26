@@ -1,45 +1,44 @@
-import { UserType } from 'src/Domain/types/UserType';
-import { VehicleType } from 'src/Domain/types/VehicleType';
+import { VehicleType } from '../../Domain/types/VehicleType';
 import { VehiclesFleetType } from '../../Domain/types/VehiclesFleetType';
 import { connectToDatabase } from '../../Infra/Database/Connect';
 import { Logger } from '../../Infra/Logger';
 
-export async function addVehicleToFleetQuery(
-  fleetId: VehiclesFleetType['fleetId'],
-  vehicleId: VehiclesFleetType['vehicleId'],
-): Promise<void> {
+export async function addVehicleToFleetQuery(fleetId: VehiclesFleetType['fleetId'], vehicle: VehicleType): Promise<void> {
   Logger.info('addVehicleToFleetQuery');
   const db = await connectToDatabase();
 
-  const existingEntry = await isVehicleInFleetQuery(fleetId, vehicleId);
+  const existingEntry = await isVehicleInFleetQuery(fleetId, vehicle.plateNumber);
   if (existingEntry) {
     throw new Error('Vehicle is already in the fleet');
   }
 
-  await db.run('INSERT INTO vehicles_fleet (fleetId, vehicleId) VALUES (?, ?)', fleetId, vehicleId);
+  await db.run('INSERT INTO vehicles_fleet (fleetId, plateNumber) VALUES (?, ?)', fleetId, vehicle.plateNumber);
 }
 
-export async function getVehicleByVehicleIdAndFleetIdQuery(
+export async function getVehicleByVehiclePlateNumberAndFleetIdQuery(
   fleetId: VehiclesFleetType['fleetId'],
-  vehicleId: VehiclesFleetType['vehicleId'],
+  vehiclePlateNumber: VehicleType['plateNumber'],
 ): Promise<VehicleType> {
-  Logger.info('getVehicleByVehicleIdAndFleetIdQuery');
+  Logger.info('getVehicleByVehiclePlateNumberAndFleetIdQuery');
   const db = await connectToDatabase();
   const vehicle = await db.get(
-    'SELECT * FROM vehicles_fleet JOIN vehicles ON vehicles_fleet.vehicleId = vehicles.vehicleId WHERE fleetId = ? AND vehicles_fleet.vehicleId = ?',
+    'SELECT * FROM vehicles_fleet JOIN vehicles ON vehicles_fleet.plateNumber = vehicles.plateNumber WHERE fleetId = ? AND vehicles_fleet.plateNumber = ?',
     fleetId,
-    vehicleId,
+    vehiclePlateNumber,
   );
+  if (!vehicle) {
+    throw new Error('Vehicle not found');
+  }
   return vehicle;
 }
 
 export async function isVehicleRegisteredInFleetQuery(
   fleetId: VehiclesFleetType['fleetId'],
-  vehicleId: VehicleType['vehicleId'],
+  vehiclePlateNumber: VehicleType['plateNumber'],
 ): Promise<boolean> {
   Logger.info('isVehicleRegisteredQuery');
   const db = await connectToDatabase();
-  const vehicle = await db.get('SELECT * FROM vehicles_fleet WHERE vehicleId = ? AND fleetId = ?', vehicleId, fleetId);
+  const vehicle = await db.get('SELECT * FROM vehicles_fleet WHERE plateNumber = ? AND fleetId = ?', vehiclePlateNumber, fleetId);
   return vehicle !== undefined;
 }
 
@@ -54,8 +53,11 @@ export async function deleteAllVehicleFleetsQuery(): Promise<void> {
   await db.run('DELETE FROM vehicles_fleet');
 }
 
-async function isVehicleInFleetQuery(fleetId: VehiclesFleetType['fleetId'], vehicleId: VehiclesFleetType['vehicleId']): Promise<boolean> {
+async function isVehicleInFleetQuery(
+  fleetId: VehiclesFleetType['fleetId'],
+  vehiclePlateNumber: VehicleType['plateNumber'],
+): Promise<boolean> {
   const db = await connectToDatabase();
-  const existingEntry = await db.get('SELECT 1 FROM vehicles_fleet WHERE fleetId = ? AND vehicleId = ?', fleetId, vehicleId);
+  const existingEntry = await db.get('SELECT 1 FROM vehicles_fleet WHERE fleetId = ? AND plateNumber = ?', fleetId, vehiclePlateNumber);
   return existingEntry !== undefined;
 }

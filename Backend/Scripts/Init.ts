@@ -7,22 +7,20 @@ async function initializeDatabase() {
     await db.exec(`
       CREATE TABLE IF NOT EXISTS users (
         userId VARCHAR(255) PRIMARY KEY,
-        fleetId VARCHAR(255) NOT NULL,
-        name VARCHAR(255) NOT NULL
+        fleetId VARCHAR(255) NOT NULL
       );
 
       CREATE TABLE IF NOT EXISTS vehicles (
-        vehicleId VARCHAR(255) UNIQUE PRIMARY KEY,
-        plateNumber VARCHAR(255) UNIQUE NOT NULL,
-        latitude FLOAT NOT NULL,
-        longitude FLOAT NOT NULL
+        plateNumber VARCHAR(255) PRIMARY KEY,
+        latitude DOUBLE NOT NULL,
+        longitude DOUBLE NOT NULL
       );
 
       CREATE TABLE IF NOT EXISTS vehicles_fleet (
         fleetId VARCHAR(255) NOT NULL,
-        vehicleId VARCHAR(255) NOT NULL,
-        PRIMARY KEY (fleet_id, vehicle_id),
-        FOREIGN KEY (vehicle_id) REFERENCES vehicle(vehicleId) ON DELETE CASCADE
+        plateNumber VARCHAR(255) NOT NULL,
+        PRIMARY KEY (fleetId, plateNumber),
+        FOREIGN KEY (plateNumber) REFERENCES vehicles(plateNumber) ON DELETE CASCADE
       );
     `);
 

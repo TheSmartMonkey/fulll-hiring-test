@@ -6,7 +6,7 @@ import {
   addVehicleToFleetQuery,
   deleteAllVehicleFleetsQuery,
   getAllVehicleFleetsQuery,
-  getVehicleByVehicleIdAndFleetIdQuery,
+  getVehicleByVehiclePlateNumberAndFleetIdQuery,
   isVehicleRegisteredInFleetQuery,
 } from './VehicleFleetQuery';
 import { deleteAllVehiclesQuery, registerVehicleQuery } from './VehicleQuery';
@@ -31,7 +31,7 @@ describe('Vehicle Fleet Integration Tests', () => {
     const vehicle: VehicleType = fakeVehicle();
 
     // When
-    await addVehicleToFleetQuery(fleetId, vehicle.vehicleId);
+    await addVehicleToFleetQuery(fleetId, vehicle);
     const vehicleFleets = await getAllVehicleFleetsQuery();
 
     // Then
@@ -44,10 +44,10 @@ describe('Vehicle Fleet Integration Tests', () => {
     const vehicle: VehicleType = fakeVehicle();
 
     // When
-    await addVehicleToFleetQuery(fleetId, vehicle.vehicleId);
+    await addVehicleToFleetQuery(fleetId, vehicle);
 
     // Then
-    expect(addVehicleToFleetQuery(fleetId, vehicle.vehicleId)).rejects.toThrow('Vehicle is already in the fleet');
+    expect(addVehicleToFleetQuery(fleetId, vehicle)).rejects.toThrow('Vehicle is already in the fleet');
   });
 
   it('Should allow same vehicle to belong to more than one fleet', async () => {
@@ -57,25 +57,35 @@ describe('Vehicle Fleet Integration Tests', () => {
     const vehicle = fakeVehicle();
 
     // When
-    await addVehicleToFleetQuery(fleetId, vehicle.vehicleId);
-    await addVehicleToFleetQuery(anotherFleetId, vehicle.vehicleId);
+    await addVehicleToFleetQuery(fleetId, vehicle);
+    await addVehicleToFleetQuery(anotherFleetId, vehicle);
     const vehicleFleets = await getAllVehicleFleetsQuery();
 
     // Then
     expect(vehicleFleets).toHaveLength(2);
   });
 
-  it('Should get a vehicle by vehicleId and fleetId', async () => {
+  it('Should get a vehicle by plateNumber and fleetId', async () => {
     // Given
     const fleetId = generateUuid();
     const vehicle = fakeVehicle();
 
     // When
     await registerVehicleQuery(fleetId, vehicle);
-    const vehicleInFleet = await getVehicleByVehicleIdAndFleetIdQuery(fleetId, vehicle.vehicleId);
+    const vehicleInFleet = await getVehicleByVehiclePlateNumberAndFleetIdQuery(fleetId, vehicle.plateNumber);
 
     // Then
-    expect(vehicleInFleet).toEqual({ ...vehicle, fleetId });
+    expect(vehicleInFleet).toEqual(expect.objectContaining({ ...vehicle, fleetId }));
+  });
+
+  it('should not get a vehicle by plateNumber and fleetId if the vehicle is not registered in the fleet', async () => {
+    // Given
+    const fleetId = generateUuid();
+    const vehicle = fakeVehicle();
+
+    // When
+    // Then
+    expect(getVehicleByVehiclePlateNumberAndFleetIdQuery(fleetId, vehicle.plateNumber)).rejects.toThrow('Vehicle not found');
   });
 
   it('should check if a vehicle is registered in the fleet', async () => {
@@ -85,7 +95,7 @@ describe('Vehicle Fleet Integration Tests', () => {
 
     // When
     await registerVehicleQuery(fleetId, vehicle);
-    const isRegistered = await isVehicleRegisteredInFleetQuery(fleetId, vehicle.vehicleId);
+    const isRegistered = await isVehicleRegisteredInFleetQuery(fleetId, vehicle.plateNumber);
 
     // Then
     expect(isRegistered).toBeTruthy();

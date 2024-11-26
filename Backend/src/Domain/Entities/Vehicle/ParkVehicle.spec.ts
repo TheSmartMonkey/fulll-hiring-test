@@ -1,27 +1,36 @@
-import * as query from '../../../App/Queries/VehicleQuery';
+import { UUID } from 'crypto';
+import * as queryVehicle from '../../../App/Queries/VehicleQuery';
 import { fakeVehicle } from '../../../Infra/Fake';
+import { generateUuid } from '../../../Infra/Helpers';
 import { LocationType } from '../../types/LocationType';
 import { VehicleType } from '../../types/VehicleType';
+import * as locationEntity from '../LocationEntity';
 import { parkVehicleInFleet } from './VehicleEntity';
 
 describe('Park a vehicle', () => {
   let vehicle: VehicleType;
   let location: LocationType;
-  let spy: jest.SpyInstance;
+  let fleetId: UUID;
+  let spyVehicle: jest.SpyInstance;
+  let spyVehicleFleet: jest.SpyInstance;
+  let spySameLocation: jest.SpyInstance;
 
   beforeEach(() => {
     location = { latitude: 20, longitude: 20 };
+    fleetId = generateUuid();
     vehicle = fakeVehicle({ latitude: location.latitude, longitude: location.longitude });
-    spy = jest.spyOn(query, 'parkVehicleInFleetQuery').mockImplementation(() => Promise.resolve(location));
+    spyVehicle = jest.spyOn(queryVehicle, 'parkVehicleInFleetQuery').mockImplementation(() => Promise.resolve(location));
+    spySameLocation = jest.spyOn(locationEntity, 'isVehicleInSameLocation').mockImplementation(() => Promise.resolve(false));
   });
 
   test('Should successfully park a vehicle', async () => {
     // Given
     // When
-    const parkedVehicleLocation = await parkVehicleInFleet(vehicle);
+    const parkedVehicleLocation = await parkVehicleInFleet(fleetId, vehicle);
 
     // Then
-    expect(spy).toHaveBeenCalledWith(vehicle);
+    expect(spyVehicle).toHaveBeenCalledWith(vehicle);
+    expect(spySameLocation).toHaveBeenCalledWith(fleetId, vehicle);
     expect(parkedVehicleLocation).toEqual(location);
   });
 
@@ -30,12 +39,12 @@ describe('Park a vehicle', () => {
     const vehicle2 = fakeVehicle({ latitude: location.latitude, longitude: location.longitude });
 
     // When
-    const parkedVehicleLocation = await parkVehicleInFleet(vehicle);
-    jest.spyOn(query, 'getVehicleByVehicleIdAndFleetIdQuery').mockImplementation(() => Promise.resolve(vehicle));
+    const parkedVehicleLocation = await parkVehicleInFleet(fleetId, vehicle);
+    jest.spyOn(locationEntity, 'isVehicleInSameLocation').mockImplementation(() => Promise.resolve(true));
 
     // Then
-    expect(spy).toHaveBeenCalledWith(vehicle);
+    expect(spyVehicle).toHaveBeenCalledWith(vehicle);
     expect(parkedVehicleLocation).toEqual(location);
-    expect(parkVehicleInFleet(vehicle2)).rejects.toThrow('Vehicle is already parked at this location');
+    expect(parkVehicleInFleet(fleetId, vehicle2)).rejects.toThrow('Vehicle is already parked at this location');
   });
 });

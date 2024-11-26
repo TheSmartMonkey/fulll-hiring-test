@@ -1,21 +1,20 @@
-import { LocationType } from 'src/Domain/types/LocationType';
-import { VehiclesFleetType } from 'src/Domain/types/VehiclesFleetType';
+import { LocationType } from '../../Domain/types/LocationType';
+import { VehiclesFleetType } from '../../Domain/types/VehiclesFleetType';
 import { VehicleType } from '../../Domain/types/VehicleType';
 import { connectToDatabase } from '../../Infra/Database/Connect';
 import { Logger } from '../../Infra/Logger';
 import { addVehicleToFleetQuery } from './VehicleFleetQuery';
 
-export async function registerVehicleQuery(fleetId: VehiclesFleetType['fleetId'], partialVehicle: VehicleType): Promise<boolean> {
+export async function registerVehicleQuery(fleetId: VehiclesFleetType['fleetId'], vehicle: VehicleType): Promise<boolean> {
   Logger.info('registerVehicleQuery');
   const db = await connectToDatabase();
   await db.run(
-    'INSERT INTO vehicles (vehicleId, plateNumber, latitude, longitude) VALUES (?, ?, ?, ?)',
-    partialVehicle.vehicleId,
-    partialVehicle.plateNumber,
-    partialVehicle.latitude,
-    partialVehicle.longitude,
+    'INSERT INTO vehicles (plateNumber, latitude, longitude) VALUES (?, ?, ?)',
+    vehicle.plateNumber,
+    vehicle.latitude,
+    vehicle.longitude,
   );
-  await addVehicleToFleetQuery(fleetId, partialVehicle.vehicleId);
+  await addVehicleToFleetQuery(fleetId, vehicle);
 
   return true;
 }
@@ -35,10 +34,10 @@ export async function parkVehicleInFleetQuery(vehicle: VehicleType): Promise<Loc
   Logger.info('parkVehicleInFleetQuery');
   const db = await connectToDatabase();
   await db.run(
-    'UPDATE vehicles SET latitude = ?, longitude = ? WHERE vehicleId = ?',
+    'UPDATE vehicles SET latitude = ?, longitude = ? WHERE plateNumber = ?',
     vehicle.latitude,
     vehicle.longitude,
-    vehicle.vehicleId,
+    vehicle.plateNumber,
   );
   return {
     latitude: vehicle.latitude,
