@@ -50,7 +50,7 @@ describe('Vehicle Fleet Integration Tests', () => {
     await addVehicleToFleetQuery(fleetId, vehicle);
 
     // Then
-    expect(addVehicleToFleetQuery(fleetId, vehicle)).rejects.toThrow('Vehicle is already in the fleet');
+    await expect(addVehicleToFleetQuery(fleetId, vehicle)).rejects.toThrow('Vehicle is already in the fleet');
   });
 
   it('Should allow same vehicle to belong to more than one fleet', async () => {
@@ -88,7 +88,7 @@ describe('Vehicle Fleet Integration Tests', () => {
 
     // When
     // Then
-    expect(getVehicleByVehiclePlateNumberAndFleetIdQuery(fleetId, vehicle.plateNumber)).rejects.toThrow('Vehicle not found');
+    await expect(getVehicleByVehiclePlateNumberAndFleetIdQuery(fleetId, vehicle.plateNumber)).rejects.toThrow('Vehicle not found');
   });
 
   it('should check if a vehicle is registered in the fleet', async () => {

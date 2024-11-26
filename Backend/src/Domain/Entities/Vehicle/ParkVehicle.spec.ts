@@ -15,7 +15,6 @@ describe('Park a vehicle', () => {
   let location: LocationType;
   let fleetId: UUID;
   let spyVehicle: jest.SpyInstance;
-  let spyVehicleFleet: jest.SpyInstance;
   let spySameLocation: jest.SpyInstance;
 
   beforeEach(() => {
@@ -48,6 +47,6 @@ describe('Park a vehicle', () => {
     // Then
     expect(spyVehicle).toHaveBeenCalledWith(vehicle);
     expect(parkedVehicleLocation).toEqual(location);
-    expect(parkVehicleInFleet(fleetId, vehicle2)).rejects.toThrow('Vehicle is already parked at this location');
+    await expect(parkVehicleInFleet(fleetId, vehicle2)).rejects.toThrow('Vehicle is already parked at this location');
   });
 });

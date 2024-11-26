@@ -43,6 +43,6 @@ describe('Register a vehicle', () => {
     expect(spyVehicle).toHaveBeenCalledWith(fleetId, vehicle);
     expect(spyVehicleFleet).toHaveBeenCalledWith(fleetId, vehicle.plateNumber);
     expect(registeredVehicle).toBeTruthy();
-    expect(registerVehicleInFleet(fleetId, vehicle)).rejects.toThrow('Vehicle is already registered');
+    await expect(registerVehicleInFleet(fleetId, vehicle)).rejects.toThrow('Vehicle is already registered');
   });
 });

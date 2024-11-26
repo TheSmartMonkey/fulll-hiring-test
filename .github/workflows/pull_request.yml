@@ -21,6 +21,12 @@ jobs:
       - name: Build code
         run: cd Backend && yarn build
 
+      - name: Check code quality
+        run: cd Backend && yarn lint:check
+
+      - name: Check code formating
+        run: cd Backend && yarn format:check
+
   unit-tests:
     needs: build
     runs-on: ubuntu-latest
