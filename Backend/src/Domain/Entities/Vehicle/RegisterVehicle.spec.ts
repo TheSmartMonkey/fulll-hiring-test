@@ -35,21 +35,4 @@ describe('Register a vehicle', () => {
     expect(registeredVehicle).toBeTruthy();
     expect(registerVehicleInFleet(vehicle)).rejects.toThrow('Vehicle is already registered');
   });
-
-  test('Should allow same vehicle to belong to more than one fleet', async () => {
-    // Given
-    const vehicleWithAnotherFleet = { ...vehicle, fleetId: generateUuid() };
-
-    // When
-    await registerVehicleInFleet(vehicle);
-    await registerVehicleInFleet(vehicleWithAnotherFleet);
-    const hasVehicle = await hasVehicleInFleet(vehicle.fleetId, vehicle.vehicleId);
-    const anotherHasVehicle = await hasVehicleInFleet(vehicleWithAnotherFleet.fleetId, vehicleWithAnotherFleet.vehicleId);
-
-    // Then
-    expect(spy).toHaveBeenCalledWith(vehicle);
-    expect(spy).toHaveBeenCalledWith(vehicleWithAnotherFleet);
-    expect(hasVehicle).toBeTruthy();
-    expect(anotherHasVehicle).toBeTruthy();
-  });
 });

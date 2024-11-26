@@ -6,21 +6,16 @@ async function initializeDatabase() {
 
     await db.exec(`
       CREATE TABLE IF NOT EXISTS users (
-        userId VARCHAR(36) PRIMARY KEY,
-        name VARCHAR(64) NOT NULL
-      );
-
-      CREATE TABLE IF NOT EXISTS fleets (
-        fleetId VARCHAR(36) PRIMARY KEY,
-        userId VARCHAR(36) NOT NULL,
-        FOREIGN KEY (userId) REFERENCES users(userId) ON DELETE CASCADE
+        userId VARCHAR(255) PRIMARY KEY,
+        fleetId VARCHAR(255) NOT NULL,
+        name VARCHAR(255) NOT NULL
       );
 
       CREATE TABLE IF NOT EXISTS vehicles (
         vehicleId VARCHAR(255) UNIQUE PRIMARY KEY,
-        plateNumber VARCHAR(7) UNIQUE NOT NULL,
-        latitude DECIMAL(10,7) NOT NULL,
-        longitude DECIMAL(10,7) NOT NULL
+        plateNumber VARCHAR(255) UNIQUE NOT NULL,
+        latitude FLOAT NOT NULL,
+        longitude FLOAT NOT NULL
       );
 
       CREATE TABLE IF NOT EXISTS vehicles_fleet (
