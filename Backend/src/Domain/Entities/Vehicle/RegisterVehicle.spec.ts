@@ -1,3 +1,6 @@
+/**
+ * @group unit
+ */
 import { UUID } from 'crypto';
 import * as queryVehicleFleet from '../../../App/Queries/VehicleFleetQuery';
 import * as queryVehicle from '../../../App/Queries/VehicleQuery';

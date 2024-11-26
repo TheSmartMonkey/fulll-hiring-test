@@ -1,3 +1,6 @@
+/**
+ * @group integration
+ */
 import { VehicleType } from '../../Domain/types/VehicleType';
 import { connectToDatabase, disconnectFromDatabase } from '../../Infra/Database/Connect';
 import { fakeVehicle } from '../../Infra/Fake';

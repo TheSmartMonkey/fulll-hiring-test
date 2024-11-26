@@ -2,6 +2,7 @@ export default {
   clearMocks: true,
   roots: ['<rootDir>'],
   testEnvironment: 'node',
+  runner: 'groups',
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',

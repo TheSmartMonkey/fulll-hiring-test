@@ -1,3 +1,6 @@
+/**
+ * @group integration
+ */
 import { connectToDatabase, disconnectFromDatabase } from '../../Infra/Database/Connect';
 import { fakeUser } from '../../Infra/Fake';
 import { createUserQuery, deleteAllUsersQuery, getAllUsersQuery } from './UserQuery';
