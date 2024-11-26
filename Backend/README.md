@@ -15,10 +15,10 @@ I've also added github ruleset to force tests to pass before merging
 I have done a simple process that could be improved when the project grows, for now I keeped it simple
 
 I have a 3 steps :
+
 - build: build the project and ansure code quality
 - unit-test: run unit tests
 - integration-test: run integration tests (tests database queries by calling directly sqlite)
-
 
 ## Getting started
 
@@ -60,4 +60,3 @@ Run integration tests (tests database queries by calling directly sqlite)
 ```shell
 yarn integration
 ```
-

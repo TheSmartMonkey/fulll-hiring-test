@@ -59,7 +59,7 @@ describe('Register a vehicle', () => {
 
     // When
     // Then
-    expect(registerVehicleInFleet(fleetId, vehicle)).rejects.toThrow('User fleet does not exist');
+    await expect(registerVehicleInFleet(fleetId, vehicle)).rejects.toThrow('User fleet does not exist');
     expect(spyVehicle).not.toHaveBeenCalled();
     expect(spyUserFleetExists).toHaveBeenCalledWith(fleetId);
   });

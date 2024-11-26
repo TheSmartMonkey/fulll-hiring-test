@@ -59,7 +59,9 @@ describe('Vehicle Fleet Integration Tests', () => {
       expect(vehicles).toHaveLength(1);
       expect(vehicles[0]).toEqual(expect.objectContaining(vehicle));
       expect(vehicleFleets).toHaveLength(2);
-      expect(vehicleFleets).toEqual(expect.arrayContaining([expect.objectContaining({ fleetId }), expect.objectContaining({ fleetId: anotherFleetId })]));
+      expect(vehicleFleets).toEqual(
+        expect.arrayContaining([expect.objectContaining({ fleetId }), expect.objectContaining({ fleetId: anotherFleetId })]),
+      );
     });
   });
 
