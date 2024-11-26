@@ -55,7 +55,7 @@ jobs:
         run: cd Backend && yarn install
 
       - name: Init database
-        run: cd Backend && yarn init
+        run: cd Backend && yarn run init
 
       - name: Run tests
         run: cd Backend && yarn integration
