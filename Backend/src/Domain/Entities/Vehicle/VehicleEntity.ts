@@ -1,3 +1,4 @@
+import { doesUserFleetExistQuery } from '../../../App/Queries/UserQuery';
 import { isVehicleRegisteredInFleetQuery } from '../../../App/Queries/VehicleFleetQuery';
 import { parkVehicleInFleetQuery, registerVehicleQuery } from '../../../App/Queries/VehicleQuery';
 import { VehiclesFleetType } from '../../../Domain/types/VehiclesFleetType';
@@ -8,6 +9,11 @@ import { isVehicleInSameLocation } from '../LocationEntity';
 
 export async function registerVehicleInFleet(fleetId: VehiclesFleetType['fleetId'], vehicle: VehicleType): Promise<boolean> {
   Logger.info('registerVehicleInFleet');
+  const userFleetExists = await doesUserFleetExistQuery(fleetId);
+  if (!userFleetExists) {
+    throw new Error('User fleet does not exist');
+  }
+
   const vehicleInFleet = await isVehicleRegisteredInFleetQuery(fleetId, vehicle.plateNumber);
   if (vehicleInFleet) {
     throw new Error('Vehicle is already registered');

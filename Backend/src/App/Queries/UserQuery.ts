@@ -1,3 +1,4 @@
+import { VehiclesFleetType } from 'src/Domain/types/VehiclesFleetType';
 import { UserType } from '../../Domain/types/UserType';
 import { connectToDatabase } from '../../Infra/Database/Connect';
 
@@ -16,4 +17,10 @@ export async function createUserQuery(user: UserType): Promise<UserType> {
 export async function deleteAllUsersQuery(): Promise<void> {
   const db = await connectToDatabase();
   await db.run('DELETE FROM users');
+}
+
+export async function doesUserFleetExistQuery(fleetId: VehiclesFleetType['fleetId']): Promise<boolean> {
+  const db = await connectToDatabase();
+  const userFleet = await db.get('SELECT * FROM users WHERE fleetId = ?', fleetId);
+  return userFleet !== undefined;
 }

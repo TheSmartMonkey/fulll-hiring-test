@@ -19,8 +19,7 @@ async function initializeDatabase() {
       CREATE TABLE IF NOT EXISTS vehicles_fleet (
         fleetId VARCHAR(255) NOT NULL,
         plateNumber VARCHAR(255) NOT NULL,
-        PRIMARY KEY (fleetId, plateNumber),
-        FOREIGN KEY (plateNumber) REFERENCES vehicles(plateNumber) ON DELETE CASCADE
+        PRIMARY KEY (fleetId, plateNumber)
       );
     `);
 
