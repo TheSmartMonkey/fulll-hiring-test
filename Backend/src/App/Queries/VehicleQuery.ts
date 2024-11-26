@@ -9,7 +9,8 @@ export async function registerVehicleQuery(fleetId: VehiclesFleetType['fleetId']
   Logger.info('registerVehicleQuery');
   const db = await connectToDatabase();
   await db.run(
-    'INSERT INTO vehicles (plateNumber, latitude, longitude) VALUES (?, ?, ?)',
+    // Ignore insert if the vehicle already exists
+    'INSERT OR IGNORE INTO vehicles (plateNumber, latitude, longitude) VALUES (?, ?, ?)',
     vehicle.plateNumber,
     vehicle.latitude,
     vehicle.longitude,

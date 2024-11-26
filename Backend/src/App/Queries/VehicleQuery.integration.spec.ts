@@ -22,7 +22,7 @@ describe('Vehicle Integration Tests', () => {
     await disconnectFromDatabase();
   });
 
-  it('should register a vehicle in the fleet', async () => {
+  it('Should register a vehicle in the fleet', async () => {
     // Given
     const fleetId = generateUuid();
     const vehicle: VehicleType = fakeVehicle();
@@ -35,7 +35,7 @@ describe('Vehicle Integration Tests', () => {
     expect(vehicles).toHaveLength(1);
   });
 
-  it('should park a vehicle in the fleet', async () => {
+  it('Should park a vehicle in the fleet', async () => {
     // Given
     const fleetId = generateUuid();
     const vehicle: VehicleType = fakeVehicle();
