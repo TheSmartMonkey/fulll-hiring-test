@@ -2,6 +2,7 @@
  * @group unit
  */
 import { UUID } from 'crypto';
+import * as queryUser from '../../../App/Queries/UserQuery';
 import * as queryVehicleFleet from '../../../App/Queries/VehicleFleetQuery';
 import * as queryVehicle from '../../../App/Queries/VehicleQuery';
 import { fakeVehicle } from '../../../Infra/Fake';
@@ -12,14 +13,18 @@ import { registerVehicleInFleet } from './VehicleEntity';
 describe('Register a vehicle', () => {
   let vehicle: VehicleType;
   let fleetId: UUID;
-  let spyVehicleFleet: jest.SpyInstance;
   let spyVehicle: jest.SpyInstance;
+  let spyVehicleRegistered: jest.SpyInstance;
+  let spyUserFleetExists: jest.SpyInstance;
 
   beforeEach(() => {
     vehicle = fakeVehicle();
     fleetId = generateUuid();
     spyVehicle = jest.spyOn(queryVehicle, 'registerVehicleQuery').mockImplementation(() => Promise.resolve(true));
-    spyVehicleFleet = jest.spyOn(queryVehicleFleet, 'isVehicleRegisteredInFleetQuery').mockImplementation(() => Promise.resolve(false));
+    spyVehicleRegistered = jest
+      .spyOn(queryVehicleFleet, 'isVehicleRegisteredInFleetQuery')
+      .mockImplementation(() => Promise.resolve(false));
+    spyUserFleetExists = jest.spyOn(queryUser, 'doesUserFleetExistQuery').mockImplementation(() => Promise.resolve(true));
   });
 
   test('Should successfully register a vehicle', async () => {
@@ -29,7 +34,8 @@ describe('Register a vehicle', () => {
 
     // Then
     expect(spyVehicle).toHaveBeenCalledWith(fleetId, vehicle);
-    expect(spyVehicleFleet).toHaveBeenCalledWith(fleetId, vehicle.plateNumber);
+    expect(spyVehicleRegistered).toHaveBeenCalledWith(fleetId, vehicle.plateNumber);
+    expect(spyUserFleetExists).toHaveBeenCalledWith(fleetId);
     expect(registeredVehicle).toBeTruthy();
   });
 
@@ -37,12 +43,24 @@ describe('Register a vehicle', () => {
     // Given
     // When
     const registeredVehicle = await registerVehicleInFleet(fleetId, vehicle);
-    spyVehicleFleet.mockImplementation(() => Promise.resolve(true));
+    spyVehicleRegistered.mockImplementation(() => Promise.resolve(true));
 
     // Then
     expect(spyVehicle).toHaveBeenCalledWith(fleetId, vehicle);
-    expect(spyVehicleFleet).toHaveBeenCalledWith(fleetId, vehicle.plateNumber);
+    expect(spyVehicleRegistered).toHaveBeenCalledWith(fleetId, vehicle.plateNumber);
+    expect(spyUserFleetExists).toHaveBeenCalledWith(fleetId);
     expect(registeredVehicle).toBeTruthy();
     await expect(registerVehicleInFleet(fleetId, vehicle)).rejects.toThrow('Vehicle is already registered');
+  });
+
+  test("Shouldn't register a vehicle in a non-existing fleet", async () => {
+    // Given
+    spyUserFleetExists = jest.spyOn(queryUser, 'doesUserFleetExistQuery').mockImplementation(() => Promise.resolve(false));
+
+    // When
+    // Then
+    expect(registerVehicleInFleet(fleetId, vehicle)).rejects.toThrow('User fleet does not exist');
+    expect(spyVehicle).not.toHaveBeenCalled();
+    expect(spyUserFleetExists).toHaveBeenCalledWith(fleetId);
   });
 });
