@@ -1,55 +1,48 @@
-import * as query from '../../../App/Queries/VehicleQuery';
+/**
+ * @group unit
+ */
+import { UUID } from 'crypto';
+import * as queryVehicleFleet from '../../../App/Queries/VehicleFleetQuery';
+import * as queryVehicle from '../../../App/Queries/VehicleQuery';
 import { fakeVehicle } from '../../../Infra/Fake';
 import { generateUuid } from '../../../Infra/Helpers';
 import { VehicleType } from '../../types/VehicleType';
-import { hasVehicleInFleet, registerVehicleInFleet } from './VehicleEntity';
+import { registerVehicleInFleet } from './VehicleEntity';
 
 describe('Register a vehicle', () => {
   let vehicle: VehicleType;
-  let spy: jest.SpyInstance;
+  let fleetId: UUID;
+  let spyVehicleFleet: jest.SpyInstance;
+  let spyVehicle: jest.SpyInstance;
 
   beforeEach(() => {
     vehicle = fakeVehicle();
-    spy = jest.spyOn(query, 'registerVehicleQuery').mockImplementation(() => Promise.resolve(true));
-    jest.spyOn(query, 'isVehicleRegisteredQuery').mockImplementation(() => Promise.resolve(false));
+    fleetId = generateUuid();
+    spyVehicle = jest.spyOn(queryVehicle, 'registerVehicleQuery').mockImplementation(() => Promise.resolve(true));
+    spyVehicleFleet = jest.spyOn(queryVehicleFleet, 'isVehicleRegisteredInFleetQuery').mockImplementation(() => Promise.resolve(false));
   });
 
   test('Should successfully register a vehicle', async () => {
     // Given
     // When
-    const registeredVehicle = await registerVehicleInFleet(vehicle);
+    const registeredVehicle = await registerVehicleInFleet(fleetId, vehicle);
 
     // Then
-    expect(spy).toHaveBeenCalledWith(vehicle);
+    expect(spyVehicle).toHaveBeenCalledWith(fleetId, vehicle);
+    expect(spyVehicleFleet).toHaveBeenCalledWith(fleetId, vehicle.plateNumber);
     expect(registeredVehicle).toBeTruthy();
   });
 
   test("Shouldn't register the same vehicle twice", async () => {
     // Given
     // When
-    const registeredVehicle = await registerVehicleInFleet(vehicle);
-    jest.spyOn(query, 'isVehicleRegisteredQuery').mockImplementation(() => Promise.resolve(true));
+    const registeredVehicle = await registerVehicleInFleet(fleetId, vehicle);
+    spyVehicleFleet.mockImplementation(() => Promise.resolve(true));
 
     // Then
-    expect(spy).toHaveBeenCalledWith(vehicle);
+    expect(spyVehicle).toHaveBeenCalledWith(fleetId, vehicle);
+    expect(spyVehicleFleet).toHaveBeenCalledWith(fleetId, vehicle.plateNumber);
     expect(registeredVehicle).toBeTruthy();
-    expect(registerVehicleInFleet(vehicle)).rejects.toThrow('Vehicle is already registered');
-  });
-
-  test('Should allow same vehicle to belong to more than one fleet', async () => {
-    // Given
-    const vehicleWithAnotherFleet = { ...vehicle, fleetId: generateUuid() };
-
-    // When
-    await registerVehicleInFleet(vehicle);
-    await registerVehicleInFleet(vehicleWithAnotherFleet);
-    const hasVehicle = await hasVehicleInFleet(vehicle.fleetId, vehicle.vehicleId);
-    const anotherHasVehicle = await hasVehicleInFleet(vehicleWithAnotherFleet.fleetId, vehicleWithAnotherFleet.vehicleId);
-
-    // Then
-    expect(spy).toHaveBeenCalledWith(vehicle);
-    expect(spy).toHaveBeenCalledWith(vehicleWithAnotherFleet);
-    expect(hasVehicle).toBeTruthy();
-    expect(anotherHasVehicle).toBeTruthy();
+    expect(registerVehicleInFleet(fleetId, vehicle)).rejects.toThrow('Vehicle is already registered');
   });
 });
